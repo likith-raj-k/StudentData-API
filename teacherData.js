@@ -69,14 +69,14 @@ app.post('/teacherData',(req, res) => {
 
 
 //show single product
-// app.get('/teacherData/:sid',(req, res) => {
-//     let sql = "SELECT * FROM studentData WHERE idStudentData="+req.params.sid;
-//     console.log(sql);
-//     let query = conn.query(sql, (err, results) => {
-//       if(err) throw err;
-//       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-//     });
-//   });
+app.get('/teacherData/:sid',(req, res) => {
+    let sql = "SELECT * FROM studentData WHERE idStudentData="+req.params.sid;
+    console.log(sql);
+    let query = conn.query(sql, (err, results) => {
+      if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+    });
+  });
 
 
 app.get('/',(req, res) => {
