@@ -4,8 +4,16 @@ const app = express();
 const cors = require('cors');
 const mysql = require('mysql');
 
+var corsOption = {
+  origin:true,
+  methods:'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials:true,
+  exposedHeaders:['x-auth-token']
+};
+
 // parse application/json
 app.use(bodyParser.json());
+app.use(cors(corsOption));
 
 //create database connection
 const conn = mysql.createConnection({
@@ -26,10 +34,26 @@ conn.connect((err) =>{
 
 });
 
-// show all products
+// show all value
+// app.get('/teacherData',(req, res) => {
+//   let sql = "SELECT * FROM teachertable";
+//   let query = conn.query(sql, (err, results) => {
+//     if(err) throw err;
+//     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+//   });
+// });
+
+
+// filtering data using get request
 app.get('/teacherData',(req, res) => {
-  debugger;
-  let sql = "SELECT * FROM teachertable";
+  let sql = "SELECT * FROM teachertable WHERE 1";
+  if(req.query.qualification != "" && req.query.qualification != null){
+    sql = sql + " AND Qualification = '" +req.query.qualification+ "'"; 
+  }
+  if(req.query.experience != "" && req.query.experience != null){
+    sql = sql + " AND Experience = "+req.query.experience;
+  }
+      
   let query = conn.query(sql, (err, results) => {
     if(err) throw err;
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -37,16 +61,37 @@ app.get('/teacherData',(req, res) => {
 });
 
 
-//add new product (Manually)
+//Delete value
+app.delete('/teacherData/:id',(req, res) => {
+  let sql = "DELETE FROM teachertable WHERE Tid="+req.params.id+"";
+  let query = conn.query(sql, (err, results) => {
+    if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  });
+});
+
+//update value
+app.put('/teacherData/:id',(req, res) => {
+  let sql = "UPDATE teachertable SET  Name='"+req.body.teachername+"',Adress='"+req.body.address+"',Experience='"+req.body.experience+"',ContactNo='"+req.body.contactno+"',Qualification='"+req.body.qualification+"',Salary='"+req.body.salary+"',uniqueId='"+req.body.uniqueid+"' WHERE Tid="+req.params.id;
+  let query = conn.query(sql, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  });
+});
+
+//add new value (Manually)
 app.post('/teacherData',(req, res) => {
+
     let data = {
         Name: req.body.teachername, 
+        uniqueID: req.body.uniqueid, 
         Adress: req.body.address, 
         Experience:req.body.experience, 
         ContactNo:req.body.contactno,
         Qualification:req.body.qualification,
         Salary:req.body.salary
     };
+
 
     let sql = "INSERT INTO teachertable SET ?";
     let query = conn.query(sql, data,(err, results) => {
@@ -56,7 +101,7 @@ app.post('/teacherData',(req, res) => {
   });
 
 
-// Automatically crearing Table
+// Automatically creating Table
   app.post('/createtable',(req, res) => {
     let sql = "CREATE TABLE Persons (PersonID int,LastName varchar(255),FirstName varchar(255),Address varchar(255), City varchar(255) );"
     let query = conn.query(sql,(err, results) => {
