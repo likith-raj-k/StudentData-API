@@ -70,7 +70,7 @@ app.delete('/teacherData/:id',(req, res) => {
   });
 });
 
-//update value
+//update value 
 app.put('/teacherData/:id',(req, res) => {
   let sql = "UPDATE teachertable SET  Name='"+req.body.teachername+"',Adress='"+req.body.address+"',Experience='"+req.body.experience+"',ContactNo='"+req.body.contactno+"',Qualification='"+req.body.qualification+"',Salary='"+req.body.salary+"',uniqueId='"+req.body.uniqueid+"' WHERE Tid="+req.params.id;
   let query = conn.query(sql, (err, results) => {
@@ -81,7 +81,6 @@ app.put('/teacherData/:id',(req, res) => {
 
 //add new value (Manually)
 app.post('/teacherData',(req, res) => {
-
     let data = {
         Name: req.body.teachername, 
         uniqueID: req.body.uniqueid, 
@@ -91,7 +90,6 @@ app.post('/teacherData',(req, res) => {
         Qualification:req.body.qualification,
         Salary:req.body.salary
     };
-
 
     let sql = "INSERT INTO teachertable SET ?";
     let query = conn.query(sql, data,(err, results) => {
@@ -111,6 +109,36 @@ app.post('/teacherData',(req, res) => {
   });
 
 
+  app.post('/loginpage',(req, res) => {
+    let sql = "SELECT * FROM loginpage WHERE Username = '"+req.body.usernameValue+ "' AND Password = '"+req.body.passwordValue+"'";
+    let query = conn.query(sql,(err, results) => {
+      if(err) throw err;
+      var oResponse={};
+        if(results.length>0) {
+          oResponse = JSON.stringify({"status": 200, "error": null, "response": true});
+        }else {
+          oResponse = JSON.stringify({"status": 200, "error": null, "response": false});
+        }
+      res.send(oResponse);
+      
+    });
+  });
+
+  // post method for signup DB
+  app.post('/signUpData',(req, res) => {
+    let data = {
+        Name: req.body.name, 
+        Username: req.body.username, 
+        Password: req.body.password, 
+    };
+
+    let sql = "INSERT INTO loginpage SET ?";
+    let query = conn.query(sql, data,(err, results) => {
+      if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+    });
+  });
+
 
 
 //show single product
@@ -123,9 +151,8 @@ app.post('/teacherData',(req, res) => {
 //     });
 //   });
 
-
+// just for example-->path
 app.get('/',(req, res) => {
-
       res.send("Welcome");
   });
 
